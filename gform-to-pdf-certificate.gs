@@ -1,47 +1,41 @@
 // Google Form PDF Generator using Slides as template
 // @shadroi
 
+function onFormSubmit(e) {
+  
+  var value = e.values;
+  
+  var email = value[1];
+  var name = value[2];
+  
+  Logger.log(value);
+  
+  var link = createPdf(name,email);
+  
+  sendEmail(name,email,link);
+}
+
+function sendEmail(name,email,link){
+  
+  var subject = "ICLS 2019 - Thanks for joining!"
+  var htmlBody = "<strong>Hello, "+name+"! </strong><br><br> Here's your free <a href="+link+">certificate</a>. Thanks for listening!<br><br>"+"<strong>Best,<br>Shad</strong>"
+  
+  GmailApp.sendEmail(email, subject, '', {htmlBody: htmlBody});
+  
+}
+
 // Replace this with ID of your template slides.
-var TEMPLATE_ID = '1Y3GLCaytUEh69e8j_e1cS-qgHN1cL_cwnq7LNKtPhGk' //DSC Certificate Slide
+var TEMPLATE_ID = '1RnhhRe7J5jSVnljQkg1UJaXKUrB3hSH5Ll1rE40JaME' //Certificate Slide
 
 //PDF FILE NAME
 var PDF_FILE_NAME = ''
 
-/**
- *  Add a menu.
-**/
+// Create New PDF from submission using the template
 
-function onOpen() {
-
-  SpreadsheetApp
-    .getUi()
-    .createMenu('PDF Generator')
-    .addItem('Create PDF', 'showDialog')
-    .addToUi()
-
-}
-
-function showDialog() {
-  var ui = SpreadsheetApp.getUi(); // Same variations.
-
-  var result = ui.alert(
-     'Please confirm',
-     'Did you select the ROW you want to generate?',
-      ui.ButtonSet.YES_NO);
-
-  // Process the user's response.
-  if (result == ui.Button.YES) {
-    // if "Yes".
-    createPdf();
-  } else {
-    // if "No" close
-  }
-}
-
-
-//Find and Replace hot keys inside '<< >>' and Create New PDF from template
-
-function createPdf() {
+function createPdf(name,email) {
+  
+  //name = "Shad"
+  //email = "shad@shadroi.com"
 
   if (TEMPLATE_ID === '') {
     
@@ -54,39 +48,33 @@ function createPdf() {
   var copyFile = DriveApp.getFileById(TEMPLATE_ID).makeCopy(),
       copyId = copyFile.getId(),
       copySlide = SlidesApp.openById(copyId),
-      copySBody = copySlide.getSlides()[0],
-      activeSheet = SpreadsheetApp.getActiveSheet(),
-      numberOfColumns = activeSheet.getLastColumn(),
-      activeRowIndex = activeSheet.getActiveRange().getRowIndex(),
-      activeRow = activeSheet.getRange(activeRowIndex, 1, 1, numberOfColumns).getValues(),
-      headerRow = activeSheet.getRange(1, 1, 1, numberOfColumns).getValues(),
-      columnIndex = 0;
+      copySBody = copySlide.getSlides()[0];
+
   
  
-  // Replace the keys with the spreadsheet values and must match with headers
- 
-  for (;columnIndex < headerRow[0].length; columnIndex++) {
-    
-    copySBody.replaceAllText('<<' + headerRow[0][columnIndex] + '>>', 
-                         activeRow[0][columnIndex])
-    
-  }
+  // Replace the keys with the spreadsheet values by having correct and matching headers
+  
+  //name
+    copySBody.replaceAllText('<<' + "Name" + '>>', name)
+   
+  //email
+    copySBody.replaceAllText('<<' + "Email" + '>>', email)
   
   // Create the PDF file, rename it if required and delete the slides copy
     
   copySlide.saveAndClose()
 
-  var newFile = DriveApp.createFile(copyFile.getAs('application/pdf'))  
-  
-  PDF_FILE_NAME = 'DSC Lead 2018 - ' + activeRow[0][0] + ' - ' + activeRow[0][1] + '.pdf';
-
-  if (PDF_FILE_NAME !== '') {
-  
-    newFile.setName(PDF_FILE_NAME)
-  } 
-  
+  //CREATING NEW FILE
+  var newFile = DriveApp.getRootFolder().createFile(copyFile.getAs('application/pdf'))  
+  //NEW FILE NAME
+  PDF_FILE_NAME = 'ICLS 2019 - ' + name + '.pdf';
+  newFile.setName(PDF_FILE_NAME)
+   
+  //TRASH EDITED FILE
   copyFile.setTrashed(true)
   
-  SpreadsheetApp.getUi().alert('New PDF file created in the root of your Google Drive')
+  return newFile.getUrl()
   
-} // 
+  SpreadsheetApp.getUi().alert('New PDF file created in the root of your Google Drive - '+newFile.getUrl())
+  
+}
