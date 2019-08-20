@@ -1,6 +1,5 @@
 // Google Form PDF Generator using Slides as template
 // @shadroi
-// inspired from @andrewroberts
 
 // Replace this with ID of your template slides.
 var TEMPLATE_ID = '1Y3GLCaytUEh69e8j_e1cS-qgHN1cL_cwnq7LNKtPhGk' //DSC Certificate Slide
@@ -64,7 +63,7 @@ function createPdf() {
       columnIndex = 0;
   
  
-  // Replace the keys with the spreadsheet values
+  // Replace the keys with the spreadsheet values and must match with headers
  
   for (;columnIndex < headerRow[0].length; columnIndex++) {
     
