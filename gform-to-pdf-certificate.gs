@@ -1,6 +1,5 @@
 // Google Form PDF Generator using Slides as template
 // @shadroi
-
 function onFormSubmit(e) {
   
   var value = e.values;
@@ -13,15 +12,6 @@ function onFormSubmit(e) {
   var link = createPdf(name,email);
   
   sendEmail(name,email,link);
-}
-
-function sendEmail(name,email,link){
-  
-  var subject = "ICLS 2019 - Thanks for joining!"
-  var htmlBody = "<strong>Hello, "+name+"! </strong><br><br> Here's your free <a href="+link+">certificate</a>. Thanks for listening!<br><br>"+"<strong>Best,<br>Shad</strong>"
-  
-  GmailApp.sendEmail(email, subject, '', {htmlBody: htmlBody});
-  
 }
 
 // Replace this with ID of your template slides.
@@ -69,6 +59,7 @@ function createPdf(name,email) {
   //NEW FILE NAME
   PDF_FILE_NAME = 'ICLS 2019 - ' + name + '.pdf';
   newFile.setName(PDF_FILE_NAME)
+  newFile.addEditor(email)
    
   //TRASH EDITED FILE
   copyFile.setTrashed(true)
@@ -78,3 +69,9 @@ function createPdf(name,email) {
   SpreadsheetApp.getUi().alert('New PDF file created in the root of your Google Drive - '+newFile.getUrl())
   
 }
+
+function sendEmail(name,email,link){
+  var subject = "ICLS 2019 - Thanks for joining!"
+  var htmlBody = "<strong>Hello, "+name+"! </strong><br><br> Here's your free <a href="+link+">certificate</a>. Thanks for listening!<br><br>"+"<strong>Best,<br>Shad</strong>"
+  GmailApp.sendEmail(email, subject, '', {htmlBody: htmlBody});
+} 
